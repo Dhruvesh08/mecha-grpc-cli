@@ -1,22 +1,19 @@
 #![deny(clippy::all)]
 
-
 use clap::{Args, Subcommand};
 use std::error::Error;
 
-// use crate::network::network_interface::NetworkManagerClient;
-
-use super::network_interface::NetworkManagerClient;
+use crate::network::network_interface::NetworkManagerClient;
 
 #[derive(Debug, Args)]
 #[command(name = "network")]
 pub struct Network {
     #[command(subcommand)]
-    pub command: NetworkCommand,
+    command: NetworkCommand,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum NetworkCommand {
+enum NetworkCommand {
     #[command(about = "Scan for wireless networks")]
     Scan,
 
@@ -31,27 +28,27 @@ pub enum NetworkCommand {
 }
 
 #[derive(Debug, Args)]
-pub struct WirelessAddArgs {
+struct WirelessAddArgs {
     #[arg(required = true)]
-    pub ssid: String,
+    ssid: String,
 
     #[arg(required = true)]
-    pub password: String,
+    password: String,
 }
 
 #[derive(Debug, Args)]
-pub struct WirelessRemoveArgs {
+struct WirelessRemoveArgs {
     #[arg(required = true)]
-    pub ssid: String,
+    ssid: String,
 }
 
 #[derive(Debug, Args)]
-pub struct WirelessConnectArgs {
+struct WirelessConnectArgs {
     #[arg(required = true)]
-    pub ssid: String,
+    ssid: String,
 
     #[arg(required = true)]
-    pub password: String,
+    password: String,
 }
 
 impl Network {
@@ -83,8 +80,9 @@ impl Network {
             NetworkCommand::Remove(_args) => {
                 // Add your remove network logic here
             }
-            NetworkCommand::Connect(_args) => {
+            NetworkCommand::Connect(args) => {
                 // Add your connect network logic here
+                println!("Connecting to wireless network: {}", args.ssid);
             }
         }
 

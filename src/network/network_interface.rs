@@ -1,18 +1,18 @@
 use tonic::transport::Channel;
 
-
 #[allow(non_snake_case)]
 pub mod networkmanager {
     tonic::include_proto!("networkmanager");
 }
 
-pub use networkmanager::{network_manager_service_client::NetworkManagerServiceClient,WifiConnectRequest,RemoveNetworkRequest,Empty};
-
+pub use networkmanager::{
+    network_manager_service_client::NetworkManagerServiceClient, Empty, RemoveNetworkRequest,
+    WifiConnectRequest,
+};
 
 pub struct NetworkManagerClient {
     client: NetworkManagerServiceClient<Channel>,
 }
-
 
 impl NetworkManagerClient {
     pub async fn new(url: String) -> Result<Self, Box<dyn std::error::Error>> {
@@ -24,9 +24,9 @@ impl NetworkManagerClient {
     pub async fn scan_wireless_network(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let request = tonic::Request::new(Empty {});
         let response = self.client.scan_wireless_network(request).await?;
-    
+
         println!("Scan Results: {:?}", response.into_inner());
-    
+
         Ok(())
     }
 
@@ -58,4 +58,3 @@ impl NetworkManagerClient {
         Ok(())
     }
 }
-
