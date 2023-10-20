@@ -3,8 +3,14 @@
 use clap::{Args, Parser, Subcommand};
 
 mod network;
-
 pub use network::Network;
+
+mod memory;
+pub use memory::Memory;
+
+mod storage;
+pub use storage::Storage;
+
 
 #[derive(Debug, Parser)]
 #[command(name = "mecha")]
@@ -18,25 +24,15 @@ struct MechaCli {
 enum Mecha {
     #[command(about = "Interact with network interfaces")]
     Network(Network),
-    // #[command(about = "Device memory info")]
-    // Memory(MemoryArgs),
-    // #[command(about = "Device storage info")]
-    // Storage(StorageArgs),
+    #[command(about = "Device memory info")]
+    Memory(Memory),
+    #[command(about = "Device storage info")]
+    Storage(Storage),
     // #[command(about = "Device Cpu info")]
     // Cpu(CpuArgs),
 }
 
-#[derive(Debug, Args)]
-struct MemoryArgs {
-    #[command(subcommand)]
-    command: Memory,
-}
 
-#[derive(Debug, Args)]
-struct StorageArgs {
-    #[command(subcommand)]
-    command: Storage,
-}
 
 //create cpu args
 #[derive(Debug, Args)]
@@ -54,21 +50,9 @@ enum Cpu {
     Info,
 }
 
-#[derive(Debug, Subcommand)]
-enum Memory {
-    #[command(about = "Get memory usage")]
-    Usage,
-    #[command(about = "Get memory info")]
-    Info,
-}
 
-#[derive(Debug, Subcommand)]
-enum Storage {
-    #[command(about = "Get storage usage")]
-    Usage,
-    #[command(about = "Get storage info")]
-    Info,
-}
+
+
 
 #[tokio::main]
 async fn main() {
@@ -80,6 +64,12 @@ async fn main() {
         Mecha::Network(network) => {
             // let mut client = NetworkManagerClient::new(url).await.unwrap();
             network.execute().await.unwrap();
+        }
+        Mecha::Memory(memory) =>{
+            memory.execute().await.unwrap();
+        }
+        Mecha::Storage(storage) =>{
+            storage.execute().await.unwrap();
         }
     }
 
