@@ -1,6 +1,6 @@
 //add clippy
 #![warn(clippy::all)]
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 
 mod network;
 pub use network::Network;
@@ -11,6 +11,11 @@ pub use memory::Memory;
 mod storage;
 pub use storage::Storage;
 
+mod cpu;
+pub use cpu::Cpu;
+
+mod display;
+pub use display::Display;
 
 #[derive(Debug, Parser)]
 #[command(name = "mecha")]
@@ -22,42 +27,22 @@ struct MechaCli {
 
 #[derive(Debug, Subcommand)]
 enum Mecha {
-    #[command(about = "Interact with network interfaces")]
+    #[command(about = "Interact with network utility")]
     Network(Network),
-    #[command(about = "Device memory info")]
+    #[command(about = "Device memory utility")]
     Memory(Memory),
-    #[command(about = "Device storage info")]
+    #[command(about = "Device storage utility")]
     Storage(Storage),
-    // #[command(about = "Device Cpu info")]
-    // Cpu(CpuArgs),
+    #[command(about = "Device Cpu utility")]
+    Cpu(Cpu),
+    #[command(about = "Device display utility")]
+    Display(Display),
 }
-
-
-
-//create cpu args
-#[derive(Debug, Args)]
-struct CpuArgs {
-    #[command(subcommand)]
-    command: Cpu,
-}
-
-//create cpu subcommands
-#[derive(Debug, Subcommand)]
-enum Cpu {
-    #[command(about = "Get cpu usage")]
-    Usage,
-    #[command(about = "Get cpu info")]
-    Info,
-}
-
-
-
-
 
 #[tokio::main]
 async fn main() {
     let args = MechaCli::parse();
-    // let url = "http://0.0.0.0:50052".to_string();
+    let url = "http://0.0.0.0:50052".to_string();
 
     match args.command {
         // we need to use execute command form network
@@ -65,11 +50,17 @@ async fn main() {
             // let mut client = NetworkManagerClient::new(url).await.unwrap();
             network.execute().await.unwrap();
         }
-        Mecha::Memory(memory) =>{
+        Mecha::Memory(memory) => {
             memory.execute().await.unwrap();
         }
-        Mecha::Storage(storage) =>{
-            storage.execute().await.unwrap();
+        Mecha::Storage(storage) => {
+            storage.execute(&url).await.unwrap();
+        }
+        Mecha::Cpu(cpu) => {
+            cpu.execute(&url).await.unwrap();
+        }
+        Mecha::Display(display) => {
+            display.execute(&url).await.unwrap();
         }
     }
 
