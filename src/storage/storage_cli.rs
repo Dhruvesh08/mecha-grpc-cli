@@ -1,6 +1,8 @@
 use anyhow::Error;
 use clap::{Args, Subcommand};
 
+use crate::storage::storage_interface::StorageManager;
+
 #[derive(Debug, Args)]
 pub struct Storage {
     #[command(subcommand)]
@@ -16,13 +18,17 @@ enum StorageCommands {
 }
 
 impl Storage {
-    pub async fn execute(&self) -> Result<(), Error> {
+    pub async fn execute(&self, uri: &str) -> Result<(), Error> {
         match self.command {
             StorageCommands::Info => {
-                println!("Storage info")
+                println!("Storage info");
+                let mut client = StorageManager::new(uri.to_string()).await?;
+                client.get_disk_info().await?;
             }
             StorageCommands::Usage => {
-                println!("Storage usage")
+                println!("Storage usage");
+                let mut client = StorageManager::new(uri.to_string()).await?;
+                client.get_disk_usage().await?;
             }
         }
 
