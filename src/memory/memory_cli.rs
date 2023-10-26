@@ -1,5 +1,7 @@
+use anyhow::Error;
 use clap::{Args, Subcommand};
-use std::error::Error;
+
+use crate::memory::memory_interface::MemoryManagerClient;
 
 #[derive(Debug, Args)]
 pub struct Memory {
@@ -16,15 +18,21 @@ enum MemoryCommands {
 }
 
 impl Memory {
-    pub async fn execute(&self) -> Result<(), Box<dyn Error>> {
+    pub async fn execute(&self) -> Result<(), Error> {
         match &self.command {
             MemoryCommands::Info => {
                 //memory info
-                print!("Device Memory info")
+                println!("Getting memory info...");
+                let mut client =
+                    MemoryManagerClient::new("http://localhost:50052".to_string()).await?;
+                client.get_memory_info().await?;
             }
             MemoryCommands::Usage => {
                 //memory usage
-                print!("Devide memory usage")
+                println!("Getting memory usage...");
+                let mut client =
+                    MemoryManagerClient::new("http://localhost:50052".to_string()).await?;
+                client.get_memory_usage().await?;
             }
         }
         Ok(())
