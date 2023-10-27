@@ -1,0 +1,4 @@
+name: mecha-compute-g1
+server:
+  port: 50052
+  url: http://localhost:50052
