@@ -1,5 +1,7 @@
 //add clippy
 #![warn(clippy::all)]
+use std::{fs::File, io::BufReader};
+
 use clap::{Parser, Subcommand};
 
 mod network;
@@ -16,6 +18,9 @@ pub use cpu::Cpu;
 
 mod display;
 pub use display::Display;
+
+mod configs;
+pub use configs::BaseConfig;
 
 #[derive(Debug, Parser)]
 #[command(name = "mecha")]
@@ -41,8 +46,18 @@ enum Mecha {
 
 #[tokio::main]
 async fn main() {
+    let profile_file = File::open("./Config.yaml").expect("Failed to open config file");
+    let reader = BufReader::new(profile_file);
+
+    let config: BaseConfig = serde_yaml::from_reader(reader).expect("unable to rad yaml file");
+
+    //port for grpc server
+    let port = config.server.port;
+    let uri = config.server.url;
+
+    let url = format!("http://{}:{}", uri, port);
+
     let args = MechaCli::parse();
-    let url = "http://0.0.0.0:50052".to_string();
 
     match args.command {
         // we need to use execute command form network
